@@ -1,0 +1,181 @@
+main {
+    margin-left: 12%;
+    margin-right: 12%;
+    font-family: Helvetica, Verdana, sans-serif;
+    font-style: italic;
+}
+
+input {
+    font-style: italic;
+    font-weight: bold;
+    color: blue;
+    border-bottom: 1px solid blue;
+    border-top: 0px;
+    border-left: 0px;
+    border-right: 0px;
+    text-align: center;
+    margin-left: 10px;
+    margin-right: 10px;
+    text-transform: uppercase;
+}
+
+header, summary, legend, .popup {
+    font-style: italic;
+    font-weight: bold;
+    color: blue;
+}
+
+summary, summary > * {
+    font-size: 16px;
+}
+
+summary {
+    padding-top: 2px;
+    padding-bottom: 2px;
+}
+
+.popup {
+    font-style: italic;
+    color: blue;
+    text-align: center;
+}
+
+fieldset {
+    border-color: DodgerBlue;
+    border-width: 1px;
+    text-align: center;
+}
+
+select {
+    font-style: italic;
+    font-weight: bold;
+    color: blue;
+    border-width: 0px;
+    background-color: transparent;
+    text-transform: uppercase;
+}
+
+option {
+    font-style: italic;
+    color: initial;
+    background-color: rgba(255, 255, 255, 0.7);
+}
+
+span {
+    font-style: normal;
+    margin-left: 10px;
+    margin-right: 15px;
+}
+
+aside {
+    margin-top: -21px;
+}
+
+
+#maplocation {
+    display: grid;
+    grid-template-columns: 300px auto;
+    grid-template-rows: auto auto;
+    width: 100%;
+    margin-top: 0px;
+}
+
+#map {
+    grid-column: 1 / span 2;
+    grid-row: 1 / span 3;
+    z-index: 0;
+    width: 100%;
+    min-height: 400px;
+}
+
+#locations {
+    grid-column: 1 / span 1;
+    grid-row: 2 / span 1;
+    background-color: rgba(255, 255, 255, 0.85);
+    z-index: 1;
+    max-width: 250px;
+    padding: 5px;
+}
+
+#who {
+    grid-column: 1 / span 2;
+    grid-row: 3;
+    z-index: 1;
+    background-color: rgba(255, 255, 255, 0.85);
+    padding: 5px;
+}
+
+#location {
+    display: table;
+}
+
+
+#loader_container {
+    grid-column: 1 / span 2;
+    grid-row: 1 / span 2;
+    z-index: 2;
+    margin: auto;
+    margin-top: 140px;
+}
+
+/* https://www.w3schools.com/howto/howto_css_loader.asp */
+
+#loader {
+  border: 16px solid #1E90FF; /* Light grey */
+  border-top: 16px solid #0000FF; /* Blue */
+  border-radius: 50%;
+  width: 120px;
+  height: 120px;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.marker_on {
+    color: blue;
+}
+
+
+/* #where {
+    position: relative;
+    z-index: 4;
+    background-color: rgba(255, 255, 255, 0.85);
+} */
+
+#where-detail {
+    background-color: rgba(255, 255, 255, 0.85);
+}
+
+#under {
+    display: grid;
+    grid-template-columns: auto auto;
+    grid-template-rows: auto auto auto;
+    width: 100%;
+}
+
+#details {
+    grid-column: 1 / span 2;
+    grid-row: 1 / span 1;
+    z-index: 1;
+}
+
+.location {
+    padding-left: 5px;
+    padding-right: 10px;
+    cursor: pointer;
+}
+
+#marker::before {
+    color: dodgerblue;
+}
+
+#marker::after {
+    color: blue;
+}
+
+h1 {
+    margin-top: 10px;
+}

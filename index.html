@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MyOwnPD - Rent a pupilometer and accurately measure your own pupillary distance</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://js.stripe.com/v3/"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?version=3.52.1&features=fetch"></script>
+    <script src="stripe.js"></script>
+<!--    mapbox-->
+    <script src='https://api.mapbox.com/mapbox-gl-js/v2.2.0/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v2.2.0/mapbox-gl.css' rel='stylesheet' />
+<!--    end mapbox-->
+<!--    paypal-->
+    <link rel="stylesheet" href="stripe.css" />
+
+<!--    end paypal-->
+<!--    my scripts-->
+    <script src="script.js"></script>
+<!--    end my scripts-->
+
+</head>
+
+<!--    templates  -->
+<template id="location">
+    <article class="location">
+        <header>
+            <h1 class="inner"></h1>
+            <template id="headerline">
+                <aside class="inner"></aside>
+            </template>
+        </header>
+        <dl>
+            <dt><small>Available for pickup:</small></dt>
+                <dd><strong><time id="commit"></time></strong></dd>
+                <dd><small>after 12:00pm</small></dd>
+            <dt><small>Address:</small></dt>
+            <template id="addressline">
+                <dd class="inner"></dd>
+            </template>
+            <template id="phone">
+                <dt><small>Phone:</small></dt>
+                    <dd><a href="tel:" class="inner"></a></dd>
+            </template>
+            <dt><small>Hours:</small></dt>
+            <dd>
+                <table>
+                    <tr>
+                        <th></th>
+                        <th><small>OPEN</small></th>
+                        <th><small>CLOSE</small></th>
+                    </tr>
+                    <template id="day">
+                        <tr>
+                            <th scope="row" class="inner"></th>
+                            <template id="open">
+                                <td><small><time class="inner"></time></small></td>
+                            </template>
+                            <template id="closed">
+                                <td colspan="2"><small>CLOSED</small></td>
+                            </template>
+                        </tr>
+                    </template>
+                </table>
+            </dd>
+        </dl>
+    </article>
+</template>
+<template id="marker"></template>
+<!--    end templates  -->
+<body>
+    <main>
+        <header><h1>MyOwnPD</h1></header>
+        <article>
+            <ul>
+                <li>Ordering glasses online? Chances are, your Pupillary Distance is not on your prescription.</li>
+                <li>In most states, optometrists are legally compelled to release your prescription, but that does not apply to PD measurements.</li>
+                <li>Online opticians need this measurement to correctly focus your lenses. An inaccurate PD can leave you with uncomfortable, ineffective, or even unsafe vision correction.</li>
+                <li>Now, you can use a professional Pupilometer to ensure you have the most accurate PD measurement possible.</li>
+                <li>Getting an accurate PD measure only needs to be done once, and can potentially save you weeks, and months of headaches returning ill fitting lenses.</li>
+                <li>Take control of your medical information and lens shopping, and measure your OWN PD!</li>
+            </ul>
+        </article>
+        <details>
+            <summary>HOW IT WORKS</summary>
+            <figure>
+                <iframe width="560" height="315" src="https://www.youtube.com/embed/p1O3EpCNOXw" frameborder="0"></iframe>
+                <figcaption>Find a friend and measure</figcaption>
+            </figure>
+            <ol>
+                <li><span>&#128179;</span>Purchase pupilometer rental and deposit</li>
+                <li><span>&#128748;</span>Receive notification your device it ready for pickup at your designated FedEx counter (<em>typically 3 business days after purchase</em>)</li>
+                <li><span>&#128707;</span>Pickup your device with valid ID</li>
+                <li><span>&#127891;</span><a href="https://looktopsi.com/psi/wp-content/uploads/2019/10/inst-HX-400.pdf">Read</a> instructions and <a href="https://youtu.be/p1O3EpCNOXw">watch</a> video</li>
+                <li><span>&#127867;</span>Find a friend</li>
+                <li><span>&#128207;</span>Measure</li>
+                <li><span>&#128747;</span>Take included return label and return to FedEx counter <em><b>within 4 days of pickup</b></em></li>
+                <li><span>&#129299;</span>Receive deposit refund and use your accurate PD to order glasses online anytime in the future</li>
+            </ol>
+        </details>
+        <form>
+            <div id="under">
+                <div id='map' hidden></div>
+                <div id="loader_container"  hidden>
+                    <div id="loader"></div>
+                </div>
+                <div id="locations" hidden></div>
+                <div id="who" hidden>
+                    <fieldset>
+                        <legend>ID OF PERSON WHO WILL PICKUP DEVICE AT FEDEX DESK (OFFICIAL PHOTO ID MUST MATCH NAME)</legend>
+                        <input type="text" id="first" name="first" placeholder="FIRST NAME" required>
+                        <input type="text" id="last" name="last" placeholder="LAST NAME" required>
+                        <input type="tel" id="phoney" name="phone" placeholder="PHONE NUMBER" minlength="10" required>
+                        <input type="email" id="email" name="email" placeholder="EMAIL" required>
+                    </fieldset>
+                </div>
+                <div id="details">
+                    <details id="where-detail">
+                        <summary id="where" class="summary">WHERE TO PICKUP:
+                            <input type="text" id="zip" placeholder="ZIP CODE" maxlength="5" size="8">
+                            <select id="hals" required hidden>
+                                <option id="fill" hidden disabled selected value>CHOOSE LOCATION</option>
+                            </select>
+                        </summary>
+
+<!--                    <div id="maplocation">-->
+<!--                        <div class="loader" id="loader" hidden></div>-->
+<!--                        <div id="thru"></div>-->
+<!--                        <div id="locations" hidden></div>-->
+<!--                        <div id="who" hidden>-->
+<!--                            <fieldset>-->
+<!--                                <legend>ID OF PERSON WHO WILL PICKUP DEVICE AT FEDEX DESK (OFFICIAL PHOTO ID MUST MATCH NAME)</legend>-->
+<!--                                <input type="text" id="first" name="first" placeholder="FIRST NAME" required>-->
+<!--                                <input type="text" id="last" name="last" placeholder="LAST NAME" required>-->
+<!--                                <input type="tel" id="phone" name="phone" placeholder="PHONE NUMBER" required>-->
+<!--                                <input type="email" id="email" name="email" placeholder="EMAIL" required>-->
+<!--                            </fieldset>-->
+<!--                        </div>-->
+<!--                    </div>-->
+                    </details>
+
+
+                </div>
+
+            </div>
+
+<!--            <details id="where-detail">-->
+<!--                <summary id="where" class="summary">WHERE TO PICKUP:-->
+<!--                    <input type="text" id="zip" placeholder="ZIP CODE" pattern="^[0-9]{5}$" maxlength="5" size="8" required>-->
+<!--                    <select id="hals" required hidden>-->
+<!--                        <option id="fill" hidden disabled selected value>CHOOSE LOCATION</option>-->
+<!--                    </select>-->
+<!--                </summary>-->
+<!--                <div id="maplocation">-->
+<!--                    <div class="loader" id="loader" hidden></div>-->
+<!--                    <div id='map' hidden></div>-->
+<!--                    <div id="locations" hidden></div>-->
+<!--                    <div id="who" hidden>-->
+<!--                        <fieldset>-->
+<!--                            <legend>ID OF PERSON WHO WILL PICKUP DEVICE AT FEDEX DESK (OFFICIAL PHOTO ID MUST MATCH NAME)</legend>-->
+<!--                            <input type="text" id="first" name="first" placeholder="FIRST NAME" required>-->
+<!--                            <input type="text" id="last" name="last" placeholder="LAST NAME" required>-->
+<!--                            <input type="tel" id="phone" name="phone" placeholder="PHONE NUMBER" required>-->
+<!--                            <input type="email" id="email" name="email" placeholder="EMAIL" required>-->
+<!--                        </fieldset>-->
+<!--                    </div>-->
+<!--                </div>-->
+
+            </details>
+            <details id="payment">
+                <summary>PAYMENT</summary>
+                <table>
+                    <caption>
+                        Initial rental
+                    </caption>
+                    <tr>
+                        <th>Fee</th>
+                        <th>Shipping</th>
+                        <th>Total Due</th>
+                    </tr>
+                    <tr>
+                        <td>$49</td>
+                        <td>$0</td>
+                        <td>$49</td>
+                    </tr>
+                </table>
+                <table>
+                    <caption>
+                        Upon return
+                    </caption>
+                    <tr>
+                        <th>Deposit Hold Released</th>
+                    </tr>
+                    <tr>
+                        <td>*+$50</td>
+                    </tr>
+                    <tr>
+                        <th>Net cost</th>
+                    </tr>
+                    <tr>
+                        <td>$49</td>
+                    </tr>
+                </table>
+                <p><small>* A total amount of $125 is authorized for payment. $49 is immediately captured by the processor. The remaining $50 remains authorized by the processor until the device is returned. Upon return, the authorization is cancelled.</small></p>
+<!--                <fieldset>-->
+<!--                    <legend>PURCHASE RENTAL</legend>-->
+                    <div id="stripe">
+    <!-- Display a payment form -->
+                        <form id="payment-form">
+                          <div id="card-element"><!--Stripe.js injects the Card Element--></div>
+                          <button id="submit">
+                            <div class="spinner hidden" id="spinner"></div>
+                            <span id="button-text">Select location and pay</span>
+                          </button>
+                          <p id="card-error" role="alert"></p>
+                          <p class="result-message hidden">
+                            Payment succeeded, see the result in your
+                            <a href="" target="_blank">Stripe dashboard.</a> Refresh the page to pay again.
+                          </p>
+                        </form>
+                      </div>
+    <!-- Display a payment form -->
+<!--                    <input type="text" id="card" name="card" placeholder="16 DIGIT CARD NUMBER" required>-->
+<!--                    <input type="text" id="cvv" name="cvv" placeholder="CVV NUMBER" required>-->
+<!--                    <br>-->
+<!--                    <input type="text" id="name" name="name" placeholder="NAME ON CARD" required>-->
+<!--                    <input type="checkbox" id="check" checked>-->
+<!--                    <label for="check"><small>Same as pickup contact</small></label>-->
+<!--                    <br>-->
+<!--                    <input type="text" id="address1" name="address1" placeholder="ADDRESS" required>-->
+<!--                    <input type="text" id="city" name="city" placeholder="CITY" required>-->
+<!--                    <br>-->
+<!--                    <input type="text" id="address2" name="address2" placeholder="ADDRESS" required>-->
+<!--                    <input type="text" id="card_zip" name="card_zip" placeholder="ZIP CODE" required>-->
+<!--                    <br>-->
+<!--                    <input type="text" id="phone" name="phone" placeholder="PHONE" required>-->
+<!--                </fieldset>-->
+                <!-- JavaScript SDK -->
+
+<!--                <button id='submit' type="submit">SEND MY PD METER</button>-->
+            </details>
+        </form>
+    </main>
+</body>
+
+</html>
